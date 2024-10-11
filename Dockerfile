@@ -1,7 +1,7 @@
 # Use an official Python runtime as a parent image
 FROM python:3.12-slim
 
-LABEL org.opencontainers.image.source=https://github.com/theitsnameless/cs24-1-bot
+LABEL org.opencontainers.image.source=https://github.com/TheItsNameless/cs24-1-bot
 
 # Set the working directory in the container
 WORKDIR /app
