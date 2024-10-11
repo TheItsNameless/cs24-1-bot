@@ -16,4 +16,4 @@ ENV CUR_SERVER=''
 ENV MENSA_CHANNEL=''
 
 # Run bot.py when the container launches
-CMD ["python", "main.py"]
+CMD ["python", "-u", "main.py"]
