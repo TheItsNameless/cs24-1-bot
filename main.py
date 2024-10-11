@@ -18,25 +18,25 @@ def get_extensions() -> typing.List[str]:
         yield file.as_posix()[:-3].replace("/", ".")
 
 
-def load_extensions(bot: commands.Bot, extensions: typing.List[str]):
+def load_extensions(bot: commands.Bot, logger: logging.Logger, extensions: typing.List[str]):
     for ext_file in extensions:
         try:
             bot.load_extension(ext_file)
-            print(f"Loaded {ext_file}")
+            logger.info("Loaded %s", ext_file)
         except Exception as ex:
-            print(f"Failed to load {ext_file}: {ex}")
+            logger.error("Failed to load %s: %s", ext_file, ex)
 
 
-def unload_extensions(bot: commands.Bot, extensions: typing.List[str]):
+def unload_extensions(bot: commands.Bot, logger: logging.Logger, extensions: typing.List[str]):
     for ext_file in extensions:
         try:
             bot.unload_extension(ext_file)
-            print(f"Unloaded {ext_file}")
+            logger.info("Unloaded %s", ext_file)
         except Exception as ex:
-            print(f"Failed to unload {ext_file}: {ex}")
+            logger.error("Failed to unload %s: %s", ext_file, ex)
 
 
-def main():
+def setup_discord_logger():
     logger = logging.getLogger('discord')
     logger.setLevel(logging.INFO)
     handler = logging.FileHandler(filename='discord.log',
@@ -44,6 +44,27 @@ def main():
                                   mode='w')
     handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
     logger.addHandler(handler)
+
+
+def setup_bot_logger():
+    logger = logging.getLogger('bot')
+    logger.setLevel(logging.INFO)
+    handler = logging.FileHandler(filename='bot.log',
+                                  encoding='utf-8',
+                                  mode='w')
+    handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+    logger.addHandler(handler)
+
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+    logger.addHandler(console_handler)
+
+
+def main():
+    setup_discord_logger()
+    setup_bot_logger()
+
+    logger = logging.getLogger("bot")
 
     intents = discord.Intents.all()
 
@@ -57,33 +78,28 @@ def main():
 
     @bot.event
     async def on_ready():
-        print('---------------------------')
-        print(datetime.now())
-        print('Logged in as:')
-        print(bot.user.name)
-        print(bot.user.id)
-        print('---------------------------')
+        logger.info(
+            "Logged in as: %s (%s) on guild %s",
+            bot.user.name, bot.user.id, bot.get_guild(int(Constants.SERVER_IDS.CUR_SERVER)).name)
 
     @bot.command(name="reload")
     @commands.has_permissions(manage_webhooks=True)
     async def reload(ctx: commands.Context):
-        unload_extensions(bot, get_extensions())
-        load_extensions(bot, get_extensions())
+        unload_extensions(bot, logger, get_extensions())
+        load_extensions(bot, logger, get_extensions())
         await ctx.send("Done")
 
     @bot.command(name="shutdown")
     @commands.has_permissions(manage_webhooks=True)
     async def shutdown(ctx):
         await ctx.message.add_reaction(Constants.REACTIONS.CHECK)
-        print("########################################################\n"
-              "########################SHUTDOWN########################\n"
-              f"Der Bot wurde von {ctx.author} heruntergefahren.\n"
-              "########################SHUTDOWN########################\n"
-              "########################################################\n")
+        logger.info("The bot was shut down by %s", ctx.author)
         await bot.close()
 
-    load_extensions(bot, get_extensions())
+    load_extensions(bot, logger, get_extensions())
     bot.run(str(os.getenv("DISCORD_TOKEN")))
+
+    bot.user.edit()
 
 
 if __name__ == "__main__":
