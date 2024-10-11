@@ -1,11 +1,12 @@
+import os
 from datetime import datetime
 
 
 class ChannelIds:
-    MENSA_CHANNEL = 846297031407435796
+    MENSA_CHANNEL = os.getenv("MENSA_CHANNEL")
     
 class ServerIds:
-    CUR_SERVER = 844928169253142528
+    CUR_SERVER = os.getenv("CUR_SERVER")
     
 class Reactions:
     CHECK = "✅"

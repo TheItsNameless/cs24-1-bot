@@ -11,7 +11,9 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Define environment variable
-ENV NAME DiscordBot
+ENV DISCORD_TOKEN=''
+ENV CUR_SERVER=''
+ENV MENSA_CHANNEL=''
 
 # Run bot.py when the container launches
 CMD ["python", "main.py"]
