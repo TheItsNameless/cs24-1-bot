@@ -29,3 +29,5 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/theitsnameless/cs24-1-bot:latest
+          build-args:
+            platform="linux/amd64,linux/arm64"
