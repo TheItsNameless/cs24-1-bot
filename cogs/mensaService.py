@@ -18,6 +18,8 @@ class MensaService(commands.Cog):
     def __init__(self, bot: discord.Bot) -> None:
         self.bot = bot
 
+    @commands.Cog.listener("on_ready")
+    async def on_ready(self):
         self.send_daily_mensa_message.start()
 
     @tasks.loop(time=time(hour=7, minute=0, tzinfo=Constants.SYSTIMEZONE))
