@@ -3,10 +3,10 @@ from datetime import datetime
 
 
 class ChannelIds:
-    MENSA_CHANNEL = os.getenv("MENSA_CHANNEL")
+    MENSA_CHANNEL = int(os.getenv("MENSA_CHANNEL"))
     
 class ServerIds:
-    CUR_SERVER = os.getenv("CUR_SERVER")
+    CUR_SERVER = int(os.getenv("CUR_SERVER"))
     
 class Reactions:
     CHECK = "✅"
