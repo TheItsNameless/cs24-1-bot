@@ -4,11 +4,14 @@ import typing
 from datetime import datetime
 from pathlib import Path
 
+from tortoise import Tortoise, run_async
+from aerich import Command
 from dotenv import load_dotenv
 
 import discord.ext.commands
 from discord.ext import commands
 
+import tortoiseConfig
 from utils.constants import Constants
 
 
@@ -59,10 +62,23 @@ def setup_bot_logger():
     console_handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
     logger.addHandler(console_handler)
 
+async def init_database():
+
+    # update the database
+    command = Command(tortoise_config=tortoiseConfig.TORTOISE_ORM, app="models")
+    await command.init()
+    await command.upgrade(run_in_transaction=True)
+
+    # init the database
+    await Tortoise.init(config=tortoiseConfig.TORTOISE_ORM)
+    await Tortoise.generate_schemas()
+
 
 def main():
     setup_discord_logger()
     setup_bot_logger()
+
+    run_async(init_database())
 
     logger = logging.getLogger("bot")
 
