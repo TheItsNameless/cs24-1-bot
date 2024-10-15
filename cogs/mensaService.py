@@ -31,7 +31,7 @@ class MensaService(commands.Cog):
         meals: list[Meal] = mensaUtils.get_mensa_plan(current_date)
 
         await channel.send(
-            f"## Mensaplan vom {current_date.strftime('%d.%m.%Y')}",
+            f"## Mensaplan vom {current_date.strftime('%d.%m.%Y')} \n ({current_date.strftime('%A')})",
             embeds=[meal.create_embed() for meal in meals])
 
     @commands.slash_command(
@@ -53,7 +53,7 @@ class MensaService(commands.Cog):
 
         meals: list[Meal] = mensaUtils.get_mensa_plan(current_date)
         await ctx.respond(
-            f"## Mensaplan vom {current_date.strftime('%d.%m.%Y')}",
+            f"## Mensaplan vom {current_date.strftime('%d.%m.%Y')} \n ({current_date.strftime('%A')})",
             embeds=[meal.create_embed() for meal in meals],
             view=MensaView(current_date))
 
