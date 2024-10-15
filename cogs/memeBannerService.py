@@ -5,6 +5,7 @@ from discord import ApplicationContext
 from discord.ext import commands, tasks
 import discord
 
+from models.database.userData import User
 from models.mensa.mensaModels import Meal
 from models.mensa.mensaView import MensaView
 from utils import mensaUtils, memeBannerUtils
@@ -37,16 +38,21 @@ class MemeBannerService(commands.Cog):
         if message.author.bot:
             return
 
-        if str(message.channel.id) == Constants.CHANNEL_IDS.MEME_CHANNEL:
+        if message.channel.id == Constants.CHANNEL_IDS.MEME_CHANNEL:
             for attachment in message.attachments:
                 if attachment.content_type.startswith("image"):
-                    await memeBannerUtils.save_meme_image(attachment)
+
+                    user, _ = await User.get_or_create(
+                        id=str(message.author.id), defaults={
+                            "global_name": message.author.name, "display_name": message.author.display_name})
+
+                    await memeBannerUtils.save_meme_image(attachment, user, message.content, message.created_at)
 
                     self.logger.info("Saved meme %s from %s", attachment.filename, message.author)
 
     @tasks.loop(minutes=5)
     async def set_random_meme_banner(self):
-        random_meme = memeBannerUtils.get_random_meme_image()
+        random_meme = memeBannerUtils.get_random_bannerized_meme()
 
         try:
             await self.bot.user.edit(banner=random_meme)

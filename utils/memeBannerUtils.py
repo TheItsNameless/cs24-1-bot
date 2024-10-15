@@ -1,16 +1,21 @@
 import os
 import random
+import uuid
+from datetime import datetime
 
 import discord
 from PIL import Image
 from io import BytesIO
+
+from models.database.memeData import Meme
+from models.database.userData import User
 from utils.constants import Constants
 
-async def save_meme_image(image: discord.Attachment) -> None:
+
+def bannerize_meme_image(image_data: bytes) -> bytes:
     """
-    Saves a meme image to the meme_images directory as a PNG, cropped to fit Discord banner size.
+    Converts a meme image to a Discord banner format.
     """
-    image_data = await image.read()
     image_stream = BytesIO(image_data)
     img = Image.open(image_stream)
 
@@ -38,9 +43,33 @@ async def save_meme_image(image: discord.Attachment) -> None:
     new_img.save(png_image_stream, format='PNG')
     png_image_stream.seek(0)
 
-    # Save the PNG image
-    with open(f"{Constants.FILE_PATHS.MEME_FOLDER}/{image.filename.split('.jpg')[0]}.png", "wb") as f:
-        f.write(png_image_stream.read())
+    return png_image_stream.read()
+
+
+async def save_meme_image(image: discord.Attachment, author: User, message: str, date: datetime) -> None:
+    """
+    Saves the original meme image to the meme_images directory.
+    """
+    image_data = await image.read()
+    image_stream = BytesIO(image_data)
+    img = Image.open(image_stream)
+
+    meme_uuid = str(uuid.uuid4())
+
+    # Save the original image
+    original_image_path = f"{Constants.FILE_PATHS.MEME_FOLDER}/{meme_uuid}.png"
+    img.save(original_image_path)
+
+    # Save metadata about the meme image
+    await save_meme_metadata(meme_uuid, author, message, date)
+
+
+async def save_meme_metadata(meme_uuid: str, author: User, message: str, date: datetime) -> None:
+    """
+    Saves metadata about the meme image to a CSV file.
+    """
+    await Meme.create(meme_uuid=meme_uuid, author=author, message=message, date=date)
+
 
 def get_random_meme_image() -> bytes:
     """
@@ -58,3 +87,16 @@ def get_random_meme_image() -> bytes:
         meme_image = f.read()
 
     return meme_image
+
+
+def get_random_bannerized_meme() -> bytes:
+    """
+    Returns a random meme image from the meme_images directory, converted to Discord banner format.
+    """
+    # Get a random meme image
+    random_meme_image = get_random_meme_image()
+
+    # Convert the random meme image to banner format
+    bannerized_image = bannerize_meme_image(random_meme_image)
+
+    return bannerized_image
