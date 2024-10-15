@@ -21,7 +21,8 @@ class Reactions:
 
 
 class FilePaths:
-    MEME_FOLDER = "data/memes"
+    RAW_MEME_FOLDER = "data/memes/raw"
+    BANNERIZED_MEME_FOLDER = "data/memes/bannerized"
     DB_FILE = "data/db.sqlite3"
 
 
