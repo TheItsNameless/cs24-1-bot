@@ -1,3 +1,4 @@
+-i https://pypi.org/simple
 py-cord~=2.6.1
 python-dotenv~=1.0.1
 beautifulsoup4~=4.12.3
@@ -5,3 +6,4 @@ requests~=2.32.3
 pillow~=10.4.0
 tortoise-orm~=0.21.7
 aerich~=0.7.2
+easyocr~=1.7.2
