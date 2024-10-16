@@ -2,6 +2,7 @@
   <configuration default="false" name="Dockerfile" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
     <deployment type="dockerfile">
       <settings>
+        <option name="buildCliOptions" value="--progress plain" />
         <option name="containerName" value="" />
         <option name="commandLineOptions" value="--env-file .env" />
         <option name="showCommandPreview" value="true" />

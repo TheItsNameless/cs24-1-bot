@@ -50,6 +50,29 @@ class MemeService(commands.Cog):
 
                     self.logger.info("Saved meme %s from %s", attachment.filename, message.author)
 
+    @commands.slash_command(
+        name="meme",
+        description="Suche nach einem zufälligen Meme",
+        guild_ids=[Constants.SERVER_IDS.CUR_SERVER])
+    async def meme(self, ctx: ApplicationContext, search: discord.Option(str, "Suchbegriff", required=False)):
+        """
+        Searches for a meme matching the search term and sends it in an embed.
+        """
+        if search is None:
+            _, meme = await memeUtils.get_random_meme(False)
+        else:
+            memes = await memeUtils.search_memes(search, 1)
+
+            if len(memes) == 0:
+                await ctx.respond(f"Kein Meme für die Suche `{search}` gefunden!")
+                return
+
+            _, meme = memes[0]
+
+        embed, meme_file = await meme.create_embed(search)
+
+        await ctx.send(embed=embed, file=meme_file)
+
     @tasks.loop(minutes=5)
     async def set_random_meme_banner(self):
         random_meme, _ = await memeUtils.get_random_meme(True)

@@ -8,6 +8,7 @@ from typing import Tuple
 import discord
 from PIL import Image, ImageSequence, ImageFile
 from io import BytesIO
+from thefuzz import fuzz
 
 from models.database.memeData import Meme, MemeFormat
 from models.database.userData import User
@@ -16,7 +17,8 @@ from utils.memeUtils import ocrUtils
 from utils.memeUtils.memeBannerUtils import bannerize_meme_image
 
 
-async def save_meme_image(logger: Logger, image: discord.Attachment, author: User, message: str, date: datetime) -> None:
+async def save_meme_image(
+    logger: Logger, image: discord.Attachment, author: User, message: str, date: datetime) -> None:
     """
     Saves the original meme image to the meme_images directory.
     """
@@ -79,3 +81,31 @@ async def get_random_meme(bannerized: bool) -> Tuple[bytes, Meme]:
         meme_image = f.read()
 
     return meme_image, random_meme
+
+
+async def search_memes(search: str, num: int, bannerized: bool = False) -> list[tuple[bytes, Meme]]:
+    """
+    Searches for memes containing the given search term.
+    """
+    memes: list[tuple[int, Meme]] = [
+        (fuzz.token_set_ratio(search, meme.content), meme)
+        for meme
+        in await Meme.all()]
+
+    filtered_memes: list[tuple[int, Meme]] = [(ratio, meme) for ratio, meme in memes if ratio > 50]
+
+    if len(filtered_memes) == 0:
+        return []
+
+    # Read the selected meme images
+    result = []
+    for _, meme in random.choices(filtered_memes, k = num):
+        meme_path = os.path.join(
+            Constants.FILE_PATHS.BANNERIZED_MEME_FOLDER if bannerized else Constants.FILE_PATHS.RAW_MEME_FOLDER,
+            f"{meme.uuid}.{meme.format.value}"
+        )
+        with open(meme_path, 'rb') as f:
+            meme_image = f.read()
+        result.append((meme_image, meme))
+
+    return result
