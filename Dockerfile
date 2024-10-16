@@ -6,6 +6,9 @@ LABEL org.opencontainers.image.source=https://github.com/TheItsNameless/cs24-1-b
 # Set the working directory in the container
 WORKDIR /app
 
+# Set timezone
+ENV TZ=Europe/Berlin
+
 # Copy the current directory contents into the container at /app
 COPY . /app
 
