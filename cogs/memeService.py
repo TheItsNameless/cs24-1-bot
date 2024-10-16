@@ -73,6 +73,13 @@ class MemeService(commands.Cog):
 
         await ctx.respond(embed=embed, file=meme_file)
 
+    @commands.slash_command(
+        name="trick",
+        description="Suche nach einem zufälligen Trick",
+        guild_ids=[Constants.SERVER_IDS.CUR_SERVER])
+    async def trick(self, ctx: ApplicationContext):
+        await self.meme(ctx, "Trick")
+
     @tasks.loop(minutes=5)
     async def set_random_meme_banner(self):
         random_meme, _ = await memeUtils.get_random_meme(True)
