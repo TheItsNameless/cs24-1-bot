@@ -8,3 +8,4 @@ tortoise-orm~=0.21.7
 aerich~=0.7.2
 easyocr~=1.7.2
 numpy~=1.26.3
+thefuzz~=0.22.1
