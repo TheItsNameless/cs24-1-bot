@@ -2,6 +2,8 @@ import os
 import random
 import uuid
 from datetime import datetime
+from logging import Logger
+from typing import Tuple
 
 import discord
 from PIL import Image, ImageSequence, ImageFile
@@ -10,10 +12,11 @@ from io import BytesIO
 from models.database.memeData import Meme, MemeFormat
 from models.database.userData import User
 from utils.constants import Constants
+from utils.memeUtils import ocrUtils
 from utils.memeUtils.memeBannerUtils import bannerize_meme_image
 
 
-async def save_meme_image(image: discord.Attachment, author: User, message: str, date: datetime) -> None:
+async def save_meme_image(logger: Logger, image: discord.Attachment, author: User, message: str, date: datetime) -> None:
     """
     Saves the original meme image to the meme_images directory.
     """
@@ -23,6 +26,9 @@ async def save_meme_image(image: discord.Attachment, author: User, message: str,
 
     meme_uuid = str(uuid.uuid4())
     extension = 'gif' if img.format == 'GIF' else 'png'
+
+    # Get the OCRed content of the image
+    ocr_content = ocrUtils.get_text_from_image(logger, img)
 
     # Save the original image
     original_image_path = f"{Constants.FILE_PATHS.RAW_MEME_FOLDER}/{meme_uuid}.{extension}"
@@ -34,7 +40,7 @@ async def save_meme_image(image: discord.Attachment, author: User, message: str,
     save_meme_image_file(Image.open(BytesIO(bannerized_image)), bannerized_image_path)
 
     # Save metadata about the meme image
-    await save_meme_metadata(meme_uuid, MemeFormat(extension), author, message, date)
+    await save_meme_metadata(meme_uuid, MemeFormat(extension), ocr_content, author, message, date)
 
 
 def save_meme_image_file(img: ImageFile, path: str) -> None:
@@ -46,18 +52,18 @@ def save_meme_image_file(img: ImageFile, path: str) -> None:
 
 
 async def save_meme_metadata(
-    meme_uuid: str, meme_format: MemeFormat, author: User, message: str, date: datetime) -> None:
+    meme_uuid: str, meme_format: MemeFormat, content: str, author: User, message: str, date: datetime) -> None:
     """
     Saves metadata about the meme image to a CSV file.
     """
-    await Meme.create(uuid=meme_uuid, format=meme_format, author=author, message=message, date=date)
+    await Meme.create(uuid=meme_uuid, format=meme_format, content=content, author=author, message=message, date=date)
 
 
-async def get_random_meme(bannerized: bool) -> bytes:
+async def get_random_meme(bannerized: bool) -> Tuple[bytes, Meme]:
     """
     Returns a random meme image from the database.
     :param bannerized: Whether to return a bannerized version of the meme.
-    :return:
+    :return: A tuple containing the meme image and the Meme metadata.
     """
     memes = await Meme.all()
 
@@ -72,4 +78,4 @@ async def get_random_meme(bannerized: bool) -> bytes:
     with open(meme_path, 'rb') as f:
         meme_image = f.read()
 
-    return meme_image
+    return meme_image, random_meme

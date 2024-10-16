@@ -13,7 +13,7 @@ from utils.memeUtils import memeUtils
 from utils.constants import Constants
 
 
-class MemeBannerService(commands.Cog):
+class MemeService(commands.Cog):
     """
     A Discord Cog for getting memes and changing the bots banner.
     """
@@ -32,7 +32,7 @@ class MemeBannerService(commands.Cog):
         self.logger.info("MemeBannerService started successfully")
 
     @commands.Cog.listener("on_message")
-    async def on_message(self, message: discord.Message):
+    async def save_memes(self, message: discord.Message):
         """
         Listens for messages in the meme channel and saves them as memes.
         """
@@ -46,13 +46,13 @@ class MemeBannerService(commands.Cog):
                         id=str(message.author.id), defaults={
                             "global_name": message.author.name, "display_name": message.author.display_name})
 
-                    await memeUtils.save_meme_image(attachment, user, message.content, message.created_at)
+                    await memeUtils.save_meme_image(self.logger, attachment, user, message.content, message.created_at)
 
                     self.logger.info("Saved meme %s from %s", attachment.filename, message.author)
 
     @tasks.loop(minutes=5)
     async def set_random_meme_banner(self):
-        random_meme = await memeUtils.get_random_meme(True)
+        random_meme, _ = await memeUtils.get_random_meme(True)
 
         try:
             await self.bot.user.edit(banner=random_meme)
@@ -63,4 +63,4 @@ class MemeBannerService(commands.Cog):
 
 def setup(bot: discord.Bot):
     logger = logging.getLogger("bot")
-    bot.add_cog(MemeBannerService(bot, logger))
+    bot.add_cog(MemeService(bot, logger))
