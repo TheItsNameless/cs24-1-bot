@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, time
 
 from discord import ApplicationContext
@@ -15,12 +16,15 @@ class MensaService(commands.Cog):
     A Discord Cog for managing Mensa-related commands and tasks.
     """
 
-    def __init__(self, bot: discord.Bot) -> None:
+    def __init__(self, bot: discord.Bot, logger: logging.Logger) -> None:
         self.bot = bot
+        self.logger = logger
 
     @commands.Cog.listener("on_ready")
     async def on_ready(self):
         self.send_daily_mensa_message.start()
+
+        self.logger.info("MensaService started successfully")
 
     @tasks.loop(time=time(hour=7, minute=0, tzinfo=Constants.SYSTIMEZONE))
     async def send_daily_mensa_message(self):
@@ -33,6 +37,8 @@ class MensaService(commands.Cog):
         await channel.send(
             f"## Mensaplan vom {current_date.strftime('%d.%m.%Y')} \n ({current_date.strftime('%A')})",
             embeds=[meal.create_embed() for meal in meals])
+
+        self.logger.info("Sent daily Mensa message")
 
     @commands.slash_command(
         name='mensa',
@@ -59,4 +65,5 @@ class MensaService(commands.Cog):
 
 
 def setup(bot: discord.Bot):
-    bot.add_cog(MensaService(bot))
+    logger = logging.getLogger("bot")
+    bot.add_cog(MensaService(bot, logger))
