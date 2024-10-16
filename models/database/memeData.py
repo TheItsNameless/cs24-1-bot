@@ -40,7 +40,7 @@ class Meme(BaseModel):
 
         embed = discord.Embed(description=f"*{self.message}*" if self.message != "" else None, timestamp=self.date)
         embed.set_image(url=f"attachment://{image_file.filename}")
-        embed.set_footer(text=f"von {self.author.display_name}")
+        embed.set_footer(text=f"von @{self.author.display_name} ({self.author.global_name})")
 
         if search is not None:
             embed.set_author(name=f"🔍 {search}")

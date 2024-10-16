@@ -71,7 +71,7 @@ class MemeService(commands.Cog):
 
         embed, meme_file = await meme.create_embed(search)
 
-        await ctx.send(embed=embed, file=meme_file)
+        await ctx.respond(embed=embed, file=meme_file)
 
     @tasks.loop(minutes=5)
     async def set_random_meme_banner(self):
