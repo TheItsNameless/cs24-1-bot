@@ -32,6 +32,10 @@ class MensaService(commands.Cog):
         channel: discord.TextChannel = guild.get_channel(Constants.CHANNEL_IDS.MENSA_CHANNEL)
 
         current_date: datetime = datetime.now()
+        
+        if not mensaUtils.check_if_mensa_is_open(current_date):
+            return
+
         meals: list[Meal] = mensaUtils.get_mensa_plan(current_date)
 
         await channel.send(

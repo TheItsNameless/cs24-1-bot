@@ -86,6 +86,9 @@ def check_if_mensa_is_open(current_date: datetime) -> bool:
     Returns:
         bool: True if the mensa is open, False otherwise.
     """
+    if current_date.weekday() >= 5:
+        return False
+    
     if current_date.date() < datetime.now().date():
         return False
 
