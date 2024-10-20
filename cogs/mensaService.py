@@ -60,6 +60,8 @@ class MensaService(commands.Cog):
             current_date: datetime = datetime.now()
         else:
             current_date: datetime = datetime.strptime(date, "%d.%m.%Y")
+            if not mensaUtils.check_if_mensa_is_open(current_date):
+                current_date = mensaUtils.get_next_mensa_day(current_date)
 
         meals: list[Meal] = mensaUtils.get_mensa_plan(current_date)
         await ctx.respond(
