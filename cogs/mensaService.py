@@ -26,7 +26,7 @@ class MensaService(commands.Cog):
 
         self.logger.info("MensaService started successfully")
 
-    @tasks.loop(time=time(hour=7, minute=0, tzinfo=Constants.SYSTIMEZONE))
+    @tasks.loop(time=time(hour=6, minute=0, tzinfo=Constants.SYSTIMEZONE))
     async def send_daily_mensa_message(self):
         guild: discord.Guild = self.bot.get_guild(Constants.SERVER_IDS.CUR_SERVER)
         channel: discord.TextChannel = guild.get_channel(Constants.CHANNEL_IDS.MENSA_CHANNEL)
