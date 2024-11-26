@@ -5,7 +5,7 @@
 Ganz einfach:
 
 1. Clone das Repo
-2. Erstelle eine venv mit `python3 -m venv venv` oder dem Tool, dass deine IDE mitbringt (*PyCharm for the win*)
+2. Erstelle eine venv mit `python3 -m venv venv` oder dem Tool, dass deine IDE mitbringt.
 3. Installiere alle Pakete aus `requirements.txt` mit `python3 -m pip install -r requirements.txt`
 4. Erstelle einen Testbot auf der [Discord Developers Seite](https://discord.com/developers)
 5. Kopiere die `EXAMPLE.env` Datei und nenne sie in `.env` um. Fülle die Werte aus.
@@ -14,7 +14,11 @@ Ganz einfach:
 
 # Datenbank Einrichtung
 1. Zunächst musst du das Tortoise-CLI tool `aerich` installieren. Führe dazu `python3 -m pip install aerich` aus.
-2. Führe `aerich init-db` aus, um die Datenbank zu initialisieren. Dies muss nur beim ersten Mal gemacht werden.
+
+> Der Nachfolgende Schritt sollte **nicht** erneut ausgeführt werden müssen, da bereits Migrationen vorhanden sind!
+2. Sollten keine Migrations in `/migrations` vorhanden sein, führe zunächst `aerich init-db` aus, um die Datenbank zu initialisieren. **Dies muss nur beim ersten Mal gemacht werden.**
+
+> Dieser Schritt ist **notwendig**!
 3. Führe `aerich upgrade` aus, um die Datenbank auf die neueste Version zu bringen.
 
 # Änderungen am Datenmodel

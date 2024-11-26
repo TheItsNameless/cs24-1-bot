@@ -1,0 +1,7 @@
+{
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportOptionalMemberAccess": "none"
+    },
+    "editor.formatOnType": true,
+    "editor.formatOnPaste": true
+}

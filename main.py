@@ -15,13 +15,14 @@ import tortoiseConfig
 from utils.constants import Constants
 
 
-def get_extensions() -> typing.List[str]:
+def get_extensions() -> typing.List[str]:  # type: ignore
     files = Path("cogs").rglob("*.py")
     for file in files:
-        yield file.as_posix()[:-3].replace("/", ".")
+        yield file.as_posix()[:-3].replace("/", ".")  # type: ignore
 
 
-def load_extensions(bot: commands.Bot, logger: logging.Logger, extensions: typing.List[str]):
+def load_extensions(bot: commands.Bot, logger: logging.Logger,
+                    extensions: typing.List[str]):
     for ext_file in extensions:
         try:
             bot.load_extension(ext_file)
@@ -30,7 +31,8 @@ def load_extensions(bot: commands.Bot, logger: logging.Logger, extensions: typin
             logger.error("Failed to load %s: %s", ext_file, ex)
 
 
-def unload_extensions(bot: commands.Bot, logger: logging.Logger, extensions: typing.List[str]):
+def unload_extensions(bot: commands.Bot, logger: logging.Logger,
+                      extensions: typing.List[str]):
     for ext_file in extensions:
         try:
             bot.unload_extension(ext_file)
@@ -45,7 +47,8 @@ def setup_discord_logger():
     handler = logging.FileHandler(filename='discord.log',
                                   encoding='utf-8',
                                   mode='w')
-    handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+    handler.setFormatter(
+        logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
     logger.addHandler(handler)
 
 
@@ -55,17 +58,21 @@ def setup_bot_logger():
     handler = logging.FileHandler(filename='bot.log',
                                   encoding='utf-8',
                                   mode='w')
-    handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+    handler.setFormatter(
+        logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
     logger.addHandler(handler)
 
     console_handler = logging.StreamHandler()
-    console_handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+    console_handler.setFormatter(
+        logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
     logger.addHandler(console_handler)
+
 
 async def init_database():
 
     # update the database
-    command = Command(tortoise_config=tortoiseConfig.TORTOISE_ORM, app="models")
+    command = Command(tortoise_config=tortoiseConfig.TORTOISE_ORM,
+                      app="models")
     await command.init()
     await command.upgrade(run_in_transaction=True)
 
@@ -94,9 +101,9 @@ def main():
 
     @bot.event
     async def on_ready():
-        logger.info(
-            "Logged in as: %s (%s) on guild %s",
-            bot.user.name, bot.user.id, bot.get_guild(int(Constants.SERVER_IDS.CUR_SERVER)).name)
+        logger.info("Logged in as: %s (%s) on guild %s", bot.user.name,
+                    bot.user.id,
+                    bot.get_guild(int(Constants.SERVER_IDS.CUR_SERVER)).name)
 
     @bot.command(name="reload")
     @commands.has_permissions(manage_webhooks=True)
@@ -115,7 +122,7 @@ def main():
     load_extensions(bot, logger, get_extensions())
     bot.run(str(os.getenv("DISCORD_TOKEN")))
 
-    bot.user.edit()
+    bot.user.edit()  # type: ignore
 
 
 if __name__ == "__main__":

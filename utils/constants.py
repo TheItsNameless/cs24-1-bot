@@ -7,12 +7,12 @@ load_dotenv()
 
 
 class ChannelIds:
-    MENSA_CHANNEL = int(os.getenv("MENSA_CHANNEL"))
-    MEME_CHANNEL = int(os.getenv("MEME_CHANNEL"))
+    MENSA_CHANNEL = int(os.getenv("MENSA_CHANNEL"))  # type: ignore
+    MEME_CHANNEL = int(os.getenv("MEME_CHANNEL"))  # type: ignore
 
 
 class ServerIds:
-    CUR_SERVER = int(os.getenv("CUR_SERVER"))
+    CUR_SERVER = int(os.getenv("CUR_SERVER"))  # type: ignore
 
 
 class Reactions:

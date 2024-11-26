@@ -1,15 +1,26 @@
+"""
+This module provides utility functions for fetching and processing the mensa plan.
+Functions:
+    get_mensa_plan(date: datetime) -> list[Meal]:
+    get_next_mensa_day(current_date: datetime) -> datetime:
+    get_last_mensa_day(current_date: datetime) -> datetime:
+    check_if_mensa_is_open(current_date: datetime) -> bool:
+    get_mensa_open_days() -> list[str]:
+    mensa_day_autocomplete(ctx: discord.AutocompleteContext) -> list[str]:
+"""
+
 from datetime import datetime, timedelta
-from email.policy import default
 
 import discord
-
-from models.mensa.mensaModels import Meal, MealType, Price
 
 import requests
 from bs4 import BeautifulSoup
 
+from models.mensa.mensaModels import Meal, MealType, Price
+
 from utils.cacheUtils import timed_cache
 from utils.constants import Constants
+
 
 @timed_cache(30)
 def get_mensa_plan(date: datetime) -> list[Meal]:
@@ -22,7 +33,8 @@ def get_mensa_plan(date: datetime) -> list[Meal]:
     Returns:
         list[Meal]: A list of Meal objects representing the meals available on the given date.
     """
-    page = requests.get(f"{Constants.URLS.MENSAPLAN}{date.strftime('%Y-%m-%d')}")
+    page = requests.get(
+        f"{Constants.URLS.MENSAPLAN}{date.strftime('%Y-%m-%d')}")
     soup = BeautifulSoup(page.content, 'html.parser')
 
     meals = []
@@ -30,8 +42,11 @@ def get_mensa_plan(date: datetime) -> list[Meal]:
     for meal in soup.select(".type--meal"):
         meal_type = MealType(meal.select_one(".meal-tags span").text)
         meal_name = meal.select_one("h4").text
-        meal_components = meal.select_one(".meal-components").text if meal.select_one(".meal-components") else None
-        meal_price = Price.get_from_string(meal.select_one(".meal-prices span").text.strip())
+        meal_components = meal.select_one(
+            ".meal-components").text if meal.select_one(
+                ".meal-components") else None
+        meal_price = Price.get_from_string(
+            meal.select_one(".meal-prices span").text.strip())
 
         meals.append(Meal(meal_type, meal_name, meal_components, meal_price))
 
@@ -88,7 +103,7 @@ def check_if_mensa_is_open(current_date: datetime) -> bool:
     """
     if current_date.weekday() >= 5:
         return False
-    
+
     if current_date.date() < datetime.now().date():
         return False
 
@@ -96,6 +111,7 @@ def check_if_mensa_is_open(current_date: datetime) -> bool:
         return False
 
     return True
+
 
 def get_mensa_open_days() -> list[str]:
     """
@@ -114,7 +130,9 @@ def get_mensa_open_days() -> list[str]:
 
     return open_days
 
-async def mensa_day_autocomplete(ctx: discord.AutocompleteContext) -> list[str]:
+
+async def mensa_day_autocomplete(
+        ctx: discord.AutocompleteContext) -> list[str]:
     """
     Autocompletes the mensa days for the mensa command.
 
