@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 from tortoise import Tortoise, run_async
-from aerich import Command
+from aerich import Command  # type: ignore
 from dotenv import load_dotenv
 
 import discord.ext.commands
@@ -21,8 +21,7 @@ def get_extensions() -> typing.List[str]:  # type: ignore
         yield file.as_posix()[:-3].replace("/", ".")  # type: ignore
 
 
-def load_extensions(bot: commands.Bot, logger: logging.Logger,
-                    extensions: typing.List[str]):
+def load_extensions(bot: commands.Bot, logger: logging.Logger, extensions: typing.List[str]):
     for ext_file in extensions:
         try:
             bot.load_extension(ext_file)
@@ -31,8 +30,11 @@ def load_extensions(bot: commands.Bot, logger: logging.Logger,
             logger.error("Failed to load %s: %s", ext_file, ex)
 
 
-def unload_extensions(bot: commands.Bot, logger: logging.Logger,
-                      extensions: typing.List[str]):
+def unload_extensions(
+    bot: commands.Bot,
+    logger: logging.Logger,
+    extensions: typing.List[str]
+):
     for ext_file in extensions:
         try:
             bot.unload_extension(ext_file)
@@ -44,35 +46,41 @@ def unload_extensions(bot: commands.Bot, logger: logging.Logger,
 def setup_discord_logger():
     logger = logging.getLogger('discord')
     logger.setLevel(logging.INFO)
-    handler = logging.FileHandler(filename='discord.log',
-                                  encoding='utf-8',
-                                  mode='w')
+    handler = logging.FileHandler(
+        filename='discord.log',
+        encoding='utf-8',
+        mode='w'
+    )
     handler.setFormatter(
-        logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+        logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s')
+    )
     logger.addHandler(handler)
 
 
 def setup_bot_logger():
     logger = logging.getLogger('bot')
     logger.setLevel(logging.INFO)
-    handler = logging.FileHandler(filename='bot.log',
-                                  encoding='utf-8',
-                                  mode='w')
+    handler = logging.FileHandler(
+        filename='bot.log',
+        encoding='utf-8',
+        mode='w'
+    )
     handler.setFormatter(
-        logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+        logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s')
+    )
     logger.addHandler(handler)
 
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(
-        logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+        logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s')
+    )
     logger.addHandler(console_handler)
 
 
 async def init_database():
 
     # update the database
-    command = Command(tortoise_config=tortoiseConfig.TORTOISE_ORM,
-                      app="models")
+    command = Command(tortoise_config=tortoiseConfig.TORTOISE_ORM, app="models")
     await command.init()
     await command.upgrade(run_in_transaction=True)
 
@@ -91,30 +99,37 @@ def main():
 
     intents = discord.Intents.all()
 
-    bot = commands.Bot(command_prefix="$",
-                       intents=intents,
-                       case_insensitive=True,
-                       help_command=None,
-                       description="A cool bot that does cool things")
+    bot = commands.Bot(
+        command_prefix="$",
+        intents=intents,
+        case_insensitive=True,
+        help_command=None,
+        description="A cool bot that does cool things"
+    )
 
     load_dotenv()
 
     @bot.event
     async def on_ready():
-        logger.info("Logged in as: %s (%s) on guild %s", bot.user.name,
-                    bot.user.id,
-                    bot.get_guild(int(Constants.SERVER_IDS.CUR_SERVER)).name)
+        assert bot.user is not None
+        logger.info(
+            "Logged in as: %s (%s) on guild %s",
+            bot.user.name,
+            bot.user.id,
+            bot.get_guild(int(Constants.SERVER_IDS.CUR_SERVER)
+                          ).name  # type: ignore
+        )
 
-    @bot.command(name="reload")
+    @bot.command(name="reload")  # type: ignore
     @commands.has_permissions(manage_webhooks=True)
-    async def reload(ctx: commands.Context):
+    async def reload(ctx: commands.Context) -> None:
         unload_extensions(bot, logger, get_extensions())
         load_extensions(bot, logger, get_extensions())
         await ctx.send("Done")
 
-    @bot.command(name="shutdown")
+    @bot.command(name="shutdown")  # type: ignore
     @commands.has_permissions(manage_webhooks=True)
-    async def shutdown(ctx):
+    async def shutdown(ctx) -> None:
         await ctx.message.add_reaction(Constants.REACTIONS.CHECK)
         logger.info("The bot was shut down by %s", ctx.author)
         await bot.close()

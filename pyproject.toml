@@ -2,3 +2,18 @@
 tortoise_orm = "tortoiseConfig.TORTOISE_ORM"
 location = "./migrations"
 src_folder = "./."
+
+[tool.yapf]
+based_on_style = "pep8"
+coalesce_brackets = false
+column_limit = 80
+dedent_closing_brackets = true
+each_dict_entry_on_separate_line = true
+space_between_ending_comma_and_closing_bracket = false
+split_all_comma_separated_values = true
+split_arguments_when_comma_terminated = true
+split_before_named_assigns = true
+
+[tool.mypy]
+check_untyped_defs = true
+line_length = 80
