@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 import discord
 
 import requests
+import bs4
 from bs4 import BeautifulSoup
 
 from models.mensa.mensaModels import Meal, MealType, Price
@@ -34,23 +35,76 @@ def get_mensa_plan(date: datetime) -> list[Meal]:
         list[Meal]: A list of Meal objects representing the meals available on the given date.
     """
     page = requests.get(
-        f"{Constants.URLS.MENSAPLAN}{date.strftime('%Y-%m-%d')}")
-    soup = BeautifulSoup(page.content, 'html.parser')
+        f"{Constants.URLS.MENSAPLAN}{date.strftime('%Y-%m-%d')}"
+    )
+    soup = BeautifulSoup(page.content, "html.parser")
 
-    meals = []
+    meals: list[Meal] = []
 
-    for meal in soup.select(".type--meal"):
-        meal_type = MealType(meal.select_one(".meal-tags span").text)
-        meal_name = meal.select_one("h4").text
-        meal_components = meal.select_one(
-            ".meal-components").text if meal.select_one(
-                ".meal-components") else None
-        meal_price = Price.get_from_string(
-            meal.select_one(".meal-prices span").text.strip())
+    for meal_element in soup.select(".type--meal"):
+        meal_type_element = meal_element.select_one(".meal-tags span")
+        meal_price_element = meal_element.select_one(".meal-prices span")
 
-        meals.append(Meal(meal_type, meal_name, meal_components, meal_price))
+        if not meal_type_element or not meal_price_element:
+            continue
+
+        meal_type = MealType(meal_type_element.text)
+        meal_price = Price.get_from_string(meal_price_element.text.strip())
+
+        if meal_type is not MealType.PASTA:
+            meal = retrieve_standard_meal_data(
+                meal_type,
+                meal_element,
+                meal_price
+            )
+            if meal:
+                meals.append(meal)
+            continue
+
+        for pasta_element in meal_element.select(".meal-subitem"):
+            meal = extract_pasta_meal_data(meal_type, pasta_element, meal_price)
+            if meal:
+                meals.append(meal)
 
     return meals
+
+
+def extract_pasta_meal_data(
+    meal_type: MealType,
+    pasta_element: bs4.Tag,
+    meal_price: Price
+) -> None | Meal:
+    meal_name_element = pasta_element.select_one("h5")
+
+    if not meal_name_element:
+        return None
+
+    meal_name = meal_name_element.text
+    meal_components = None  # TODO maybe there are components, but i can not find them
+    meal_price = meal_price
+
+    meal = Meal(meal_type, meal_name, meal_components, meal_price)
+    return meal
+
+
+def retrieve_standard_meal_data(
+    meal_type: MealType,
+    meal_element: bs4.Tag,
+    meal_price: Price,
+) -> Meal | None:
+    meal_name_element = meal_element.select_one("h4")
+    meal_components_element = meal_element.select_one(".meal-components")
+
+    if not meal_name_element or not meal_components_element:
+        return None
+
+    meal_name = meal_name_element.text
+
+    meal_components = meal_components_element.text if meal_element.select_one(
+        ".meal-components"
+    ) else None
+
+    return Meal(meal_type, meal_name, meal_components, meal_price)
 
 
 def get_next_mensa_day(current_date: datetime) -> datetime:

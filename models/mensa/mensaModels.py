@@ -9,6 +9,7 @@ class MealType(Enum):
     VEGAN = "Veganes Gericht"
     VEGETARIAN = "Vegetarisches Gericht"
     MEAT = "Fleischgericht"
+    PASTA = "Pastateller"
 
 
 @dataclass
