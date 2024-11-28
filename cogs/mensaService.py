@@ -73,8 +73,11 @@ class MensaService(commands.Cog):
                 current_date = mensaUtils.get_next_mensa_day(current_date)
 
         meals: list[Meal] = mensaUtils.get_mensa_plan(current_date)
+
+        weekday_german = mensaUtils.format_weekday_in_german(current_date)
+
         await ctx.respond(
-            f"## Mensaplan vom {current_date.strftime('%d.%m.%Y')} \n ({current_date.strftime('%A')})",
+            f"## Mensaplan von {weekday_german}, {current_date.strftime('%d.%m.%Y')}",
             embeds=[meal.create_embed() for meal in meals],
             view=MensaView(current_date)
         )

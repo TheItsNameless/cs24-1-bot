@@ -131,6 +131,29 @@ def get_mensa_open_days() -> list[str]:
     return open_days
 
 
+def format_weekday_in_german(date: datetime) -> str:
+    """
+    Converts a given date's weekday to its German equivalent.
+
+    Args:
+        date (datetime): The date object from which to extract the weekday.
+
+    Returns:
+        str: The German name of the weekday corresponding to the given date.
+    """
+    weekday = date.strftime('%A')
+    return {
+        'Monday': 'Montag',
+        'Tuesday': 'Dienstag',
+        'Wednesday': 'Mittwoch',
+        'Thursday': 'Donnerstag',
+        'Friday': 'Freitag',
+        'Saturday': 'Samstag',
+        'Sunday': 'Sonntag',
+    }.get(weekday,
+          weekday)
+
+
 async def mensa_day_autocomplete(
         ctx: discord.AutocompleteContext) -> list[str]:
     """
