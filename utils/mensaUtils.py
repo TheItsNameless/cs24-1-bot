@@ -10,6 +10,7 @@ Functions:
 """
 
 from datetime import datetime, timedelta
+from typing import Iterator
 
 import discord
 
@@ -24,7 +25,7 @@ from utils.constants import Constants
 
 
 @timed_cache(30)
-def get_mensa_plan(date: datetime) -> list[Meal]:
+def get_mensa_plan(date: datetime) -> Iterator[Meal]:
     """
     Fetches the mensa plan for a given date.
 
@@ -32,14 +33,12 @@ def get_mensa_plan(date: datetime) -> list[Meal]:
         date (datetime): The date for which to fetch the mensa plan.
 
     Returns:
-        list[Meal]: A list of Meal objects representing the meals available on the given date.
+        iter: An iterator of Meal objects representing the meals available on the given date.
     """
     page = requests.get(
         f"{Constants.URLS.MENSAPLAN}{date.strftime('%Y-%m-%d')}"
     )
     soup = BeautifulSoup(page.content, "html.parser")
-
-    meals: list[Meal] = []
 
     for meal_element in soup.select(".type--meal"):
         meal_type_element = meal_element.select_one(".meal-tags span")
@@ -58,15 +57,13 @@ def get_mensa_plan(date: datetime) -> list[Meal]:
                 meal_price
             )
             if meal:
-                meals.append(meal)
+                yield meal
             continue
 
         for pasta_element in meal_element.select(".meal-subitem"):
             meal = extract_pasta_meal_data(meal_type, pasta_element, meal_price)
             if meal:
-                meals.append(meal)
-
-    return meals
+                yield meal
 
 
 def extract_pasta_meal_data(

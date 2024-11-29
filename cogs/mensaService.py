@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, time
+from typing import Iterator
 
 from discord import ApplicationContext
 from discord.ext import commands, tasks
@@ -40,7 +41,7 @@ class MensaService(commands.Cog):
         if not mensaUtils.check_if_mensa_is_open(current_date):
             return
 
-        meals: list[Meal] = mensaUtils.get_mensa_plan(current_date)
+        meals: Iterator[Meal] = mensaUtils.get_mensa_plan(current_date)
 
         await channel.send(
             f"## Mensaplan vom {current_date.strftime('%d.%m.%Y')} \n ({current_date.strftime('%A')})",
@@ -72,7 +73,7 @@ class MensaService(commands.Cog):
             if not mensaUtils.check_if_mensa_is_open(current_date):
                 current_date = mensaUtils.get_next_mensa_day(current_date)
 
-        meals: list[Meal] = mensaUtils.get_mensa_plan(current_date)
+        meals: Iterator[Meal] = mensaUtils.get_mensa_plan(current_date)
 
         weekday_german = mensaUtils.format_weekday_in_german(current_date)
 
