@@ -1,0 +1,16 @@
+{
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportOptionalMemberAccess": "none",
+        "reportInvalidTypeForm": false
+    },
+    "editor.formatOnType": true,
+    "editor.formatOnPaste": true,
+    "editor.defaultFormatter": "eeyore.yapf",
+    "yapf.args": [
+        "--style=pyproject.toml"
+    ],
+    "mypy-type-checker.args": [
+        "--config-file",
+        "pyproject.toml"
+    ]
+}

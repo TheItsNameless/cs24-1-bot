@@ -1,14 +1,10 @@
 import logging
-from datetime import datetime, time
 
 from discord import ApplicationContext
 from discord.ext import commands, tasks
 import discord
 
 from models.database.userData import User
-from models.mensa.mensaModels import Meal
-from models.mensa.mensaView import MensaView
-from utils import mensaUtils
 from utils.memeUtils import memeUtils
 from utils.constants import Constants
 
@@ -39,22 +35,44 @@ class MemeService(commands.Cog):
         if message.author.bot:
             return
 
-        if message.channel.id == Constants.CHANNEL_IDS.MEME_CHANNEL:
-            for attachment in message.attachments:
-                if attachment.content_type.startswith("image"):
-                    user, _ = await User.get_or_create(
-                        id=str(message.author.id), defaults={
-                            "global_name": message.author.name, "display_name": message.author.display_name})
+        if message.channel.id != Constants.CHANNEL_IDS.MEME_CHANNEL:
+            return
 
-                    await memeUtils.save_meme_image(self.logger, attachment, user, message.content, message.created_at)
+        for attachment in message.attachments:
+            if attachment.content_type is None or not attachment.content_type.startswith(
+                "image"
+            ):
+                continue
 
-                    self.logger.info("Saved meme %s from %s", attachment.filename, message.author)
+            user, _ = await User.get_or_create(
+                id=str(message.author.id), defaults={
+                    "global_name": message.author.name, "display_name": message.author.display_name})
+
+            await memeUtils.save_meme_image(
+                self.logger,
+                attachment,
+                user,
+                message.content,
+                message.created_at
+            )
+
+            self.logger.info(
+                "Saved meme %s from %s",
+                attachment.filename,
+                message.author
+            )
 
     @commands.slash_command(
         name="meme",
         description="Suche nach einem zufälligen Meme",
-        guild_ids=[Constants.SERVER_IDS.CUR_SERVER])
-    async def meme(self, ctx: ApplicationContext, search: discord.Option(str, "Suchbegriff", required=False)):
+        guild_ids=[Constants.SERVER_IDS.CUR_SERVER]
+    )
+    @discord.option(
+        "search",
+        type=discord.SlashCommandOptionType.string,
+        required=False
+    )
+    async def meme(self, ctx: ApplicationContext, search: str):
         """
         Searches for a meme matching the search term and sends it in an embed.
         """
@@ -64,7 +82,9 @@ class MemeService(commands.Cog):
             memes = await memeUtils.search_memes(search, 1)
 
             if len(memes) == 0:
-                await ctx.respond(f"Kein Meme für die Suche `{search}` gefunden!")
+                await ctx.respond(
+                    f"Kein Meme für die Suche `{search}` gefunden!"
+                )
                 return
 
             _, meme = memes[0]
@@ -76,12 +96,14 @@ class MemeService(commands.Cog):
     @commands.slash_command(
         name="trick",
         description="Suche nach einem zufälligen Trick",
-        guild_ids=[Constants.SERVER_IDS.CUR_SERVER])
+        guild_ids=[Constants.SERVER_IDS.CUR_SERVER]
+    )
     async def trick(self, ctx: ApplicationContext):
         await self.meme(ctx, "Trick")
 
     @tasks.loop(minutes=5)
     async def set_random_meme_banner(self):
+        assert self.bot.user is not None
         random_meme, _ = await memeUtils.get_random_meme(True)
 
         try:
