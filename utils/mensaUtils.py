@@ -92,14 +92,12 @@ def retrieve_standard_meal_data(
     meal_name_element = meal_element.select_one("h4")
     meal_components_element = meal_element.select_one(".meal-components")
 
-    if not meal_name_element or not meal_components_element:
+    if not meal_name_element:
         return None
 
     meal_name = meal_name_element.text
 
-    meal_components = meal_components_element.text if meal_element.select_one(
-        ".meal-components"
-    ) else None
+    meal_components = meal_components_element.text if meal_components_element else None
 
     return Meal(meal_type, meal_name, meal_components, meal_price)
 
@@ -205,8 +203,7 @@ def format_weekday_in_german(date: datetime) -> str:
           weekday)
 
 
-async def mensa_day_autocomplete(
-        ctx: discord.AutocompleteContext) -> list[str]:
+async def mensa_day_autocomplete(ctx: discord.AutocompleteContext) -> list[str]:
     """
     Autocompletes the mensa days for the mensa command.
 
