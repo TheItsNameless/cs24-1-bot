@@ -135,7 +135,7 @@ def main():
         await bot.close()
 
     load_extensions(bot, logger, get_extensions())
-    bot.run(str(os.getenv("DISCORD_TOKEN")))
+    bot.run(Constants.SECRETS.DISCORD_TOKEN)
 
     bot.user.edit()  # type: ignore
 
