@@ -12,5 +12,8 @@
     "mypy-type-checker.args": [
         "--config-file",
         "pyproject.toml"
-    ]
+    ],
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    }
 }
