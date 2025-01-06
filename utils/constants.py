@@ -44,5 +44,5 @@ class Constants:
     URLS = Urls
     FILE_PATHS = FilePaths
     # --- ADDITIONAL CONSTANTS ---
-    SYSTIMEZONE = datetime.now().astimezone(
-    ).tzinfo
+    SYSTIMEZONE = datetime.now().astimezone().tzinfo
+    OPENAI_MODEL = "gpt-4o-mini"
