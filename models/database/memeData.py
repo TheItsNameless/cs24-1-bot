@@ -1,12 +1,16 @@
 from enum import Enum
 
+from typing import TYPE_CHECKING
+
 import discord
 from tortoise import Model
 from tortoise import fields
 
 from models.database.baseModel import BaseModel
-from models.database.userData import User
 from utils.constants import Constants
+
+if TYPE_CHECKING:
+    from models.database.userData import User
 
 
 class MemeFormat(Enum):
@@ -20,13 +24,26 @@ class Meme(BaseModel):
     A class representing a meme image.
     """
     uuid = fields.UUIDField(pk=True, description="The UUID of the meme image")
-    format = fields.CharEnumField(MemeFormat, max_length=3, description="The format of the meme image")
-    message = fields.TextField(description="The message that the user attached to the meme image")
-    content = fields.TextField(description="The OCRed content of the meme image")
-    author: fields.ForeignKeyRelation[User] = fields.ForeignKeyField("models.User", related_name="memes")
+    format = fields.CharEnumField(
+        MemeFormat,
+        max_length=3,
+        description="The format of the meme image"
+    )
+    message = fields.TextField(
+        description="The message that the user attached to the meme image"
+    )
+    content = fields.TextField(
+        description="The OCRed content of the meme image"
+    )
+    author: fields.ForeignKeyRelation["User"] = fields.ForeignKeyField(
+        "models.User",
+        related_name="memes"
+    )
     date = fields.DatetimeField(description="The date the meme was sent")
 
-    async def create_embed(self, search: str | None) -> tuple[discord.Embed, discord.File]:
+    async def create_embed(self,
+                           search: str | None) -> tuple[discord.Embed,
+                                                        discord.File]:
         """
         Create a Discord embed for the meme.
 
@@ -36,11 +53,17 @@ class Meme(BaseModel):
         await self.fetch_related("author")
         image_file = discord.File(
             f"{Constants.FILE_PATHS.RAW_MEME_FOLDER}/{self.uuid}.{self.format.value}",
-            filename=f"{self.uuid}.{self.format.value}")
+            filename=f"{self.uuid}.{self.format.value}"
+        )
 
-        embed = discord.Embed(description=f"*{self.message}*" if self.message != "" else None, timestamp=self.date)
+        embed = discord.Embed(
+            description=f"*{self.message}*" if self.message != "" else None,
+            timestamp=self.date
+        )
         embed.set_image(url=f"attachment://{image_file.filename}")
-        embed.set_footer(text=f"von @{self.author.display_name} ({self.author.global_name})")
+        embed.set_footer(
+            text=f"von @{self.author.display_name} ({self.author.global_name})"
+        )
 
         if search is not None:
             embed.set_author(name=f"🔍 {search}")
