@@ -25,5 +25,5 @@ Ganz einfach:
 
 Solltest du Änderungen an den Daten vornehmen, die in der Datenbank gespeichert werden, musst du die Datenbankmigrationen aktualisieren.
 
-1. Führe `aerich migrate --name <name der migration>` aus, um eine neue Migration zu erstellen.
+1. Führe `aerich migrate --name=<name der migration>` aus, um eine neue Migration zu erstellen.
 2. Führe `aerich upgrade` aus, um die Datenbank auf den neuesten Stand zu bringen.

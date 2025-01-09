@@ -6,8 +6,14 @@ TORTOISE_ORM = {
     },
     "apps": {
         "models": {
-            "models": ["models.database.userData","models.database.memeData", "aerich.models"],
-            "default_connection": "default",
+            "models": [
+                "models.database.userData",
+                "models.database.memeData",
+                "models.database.aiData",
+                "aerich.models",
+            ],
+            "default_connection":
+            "default",
         },
     },
 }

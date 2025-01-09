@@ -6,7 +6,6 @@ import discord
 
 from models.database.userData import User
 from utils.ai import ai
-from utils.memeUtils import memeUtils
 from utils.constants import Constants
 
 
