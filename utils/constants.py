@@ -36,6 +36,11 @@ class Urls:
     MENSAPLAN = "https://www.studentenwerk-leipzig.de/mensen-cafeterien/speiseplan/?location=140&date="
 
 
+class AI:
+    OPENAI_MODEL = "gpt-4o-mini"
+    MAX_TRANSLATE_REQUESTS_PER_DAY = 5
+
+
 class Constants:
     SECRETS = Secrects
     CHANNEL_IDS = ChannelIds
@@ -43,6 +48,6 @@ class Constants:
     REACTIONS = Reactions
     URLS = Urls
     FILE_PATHS = FilePaths
+    AI = AI
     # --- ADDITIONAL CONSTANTS ---
     SYSTIMEZONE = datetime.now().astimezone().tzinfo
-    OPENAI_MODEL = "gpt-4o-mini"

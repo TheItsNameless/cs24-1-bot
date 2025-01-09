@@ -14,7 +14,7 @@ class AIUtils:
 
     def code_translate(self, language: str, code: str) -> CodeTranslateResponse:
         response = self.client.chat.completions.create(
-            model=Constants.OPENAI_MODEL,
+            model=Constants.AI.OPENAI_MODEL,
             messages=[
                 {"role": "system", "content": system_data.code_translate_system_message},
                 {"role": "user", "content": f"{{\"code\": \"{code}\", \"language\": \"{language}\"}}"}
