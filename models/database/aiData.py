@@ -7,19 +7,21 @@ class AIMetadata(BaseModel):
     """
     A class representing metadata for the AI service.
     """
-    user: fields.ForeignKeyRelation["User"] = fields.ForeignKeyField(
+    usage_today = fields.IntField(
+        description="The number of requests used today",
+        default=0
+    )
+    user: fields.OneToOneRelation["User"] = fields.OneToOneField(
         "models.User",
         related_name="ai_metadata"
     )
-    usage_today = fields.IntField(
-        description="The number of requests used today"
-    )
 
-    def increment_usage(self):
+    async def increment_usage(self):
         """
         Increment the usage of the AI for the user service by one.
         """
         self.usage_today += 1
+        await self.save()
 
     def reset_usage(self):
         """

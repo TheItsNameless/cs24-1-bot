@@ -28,7 +28,7 @@ class CodeTranslateResponse:
         )
         embed.set_footer(
             text=
-            f"von @{author.display_name} ({author.global_name}) f({self.tokens_used} Tokens verwendet)"
+            f"von @{author.display_name} ({author.global_name}) ({self.tokens_used} Tokens verwendet)"
         )
         embed.set_author(name=get_usage(remaining_usage))
         embed.title = f"{self.detected_language} auf {self.translated_language}"

@@ -47,6 +47,19 @@ class AIService(commands.Cog):
 
         await ctx.defer()
 
+        user, _ = await User.get_or_create(
+                id=str(ctx.author.id), defaults={
+                    "global_name": ctx.author.name, "display_name": ctx.author.display_name})
+
+        if await user.remaining_ai_requests() <= 0:
+            await ctx.respond(
+                "AI ist nicht billig, du hast dein tägliches Limit erreicht. Versuche es morgen erneut.",
+                ephemeral=True
+            )
+            return
+
+        await user.increment_ai_usage()
+
         try:
             response = self.ai.code_translate(language, code)
         except Exception as e:
@@ -57,7 +70,10 @@ class AIService(commands.Cog):
             )
             return
 
-        embed = await response.create_embed(ctx.author, 1)
+        embed = await response.create_embed(
+            ctx.author,
+            await user.remaining_ai_requests()
+        )
 
         await ctx.respond(embed=embed)
 
