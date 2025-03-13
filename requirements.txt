@@ -11,4 +11,6 @@ aerich~=0.7.2
 easyocr~=1.7.2
 numpy~=1.26.3
 thefuzz~=0.22.1
-openai==1.55.1
+openai==1.66.3
+# OpenAI is using latest, but it has a bug with TypeError: invalid keyword 'proxies'
+httpx==0.27.2
