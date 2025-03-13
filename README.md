@@ -6,7 +6,7 @@ Ganz einfach:
 
 1. Clone das Repo
 2. Erstelle eine venv mit `python3 -m venv venv` oder dem Tool, dass deine IDE mitbringt.
-3. Installiere alle Pakete aus `requirements.txt` mit `python3 -m pip install -r requirements.txt`
+3. Installiere alle Pakete aus `requirements.txt` und `torch.requirements.txt` mit `python3 -m pip install -r requirements.txt` (bzw. `python3 -m pip install -r requirements.txt`).
 4. Erstelle einen Testbot auf der [Discord Developers Seite](https://discord.com/developers)
 5. Kopiere die `EXAMPLE.env` Datei und nenne sie in `.env` um. Fülle die Werte aus.
 6. Richte die Datenbank ein. Befolge [diese Anleitung](#Datenbank-Einrichtung).
@@ -25,5 +25,5 @@ Ganz einfach:
 
 Solltest du Änderungen an den Daten vornehmen, die in der Datenbank gespeichert werden, musst du die Datenbankmigrationen aktualisieren.
 
-1. Führe `aerich migrate --name <name der migration>` aus, um eine neue Migration zu erstellen.
+1. Führe `aerich migrate --name=<name der migration>` aus, um eine neue Migration zu erstellen.
 2. Führe `aerich upgrade` aus, um die Datenbank auf den neuesten Stand zu bringen.
