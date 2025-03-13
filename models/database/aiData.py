@@ -23,11 +23,12 @@ class AIMetadata(BaseModel):
         self.usage_today += 1
         await self.save()
 
-    def reset_usage(self):
+    async def reset_usage(self):
         """
         Reset the usage of the AI service for the user.
         """
         self.usage_today = 0
+        await self.save()
 
     def __str__(self):
         """

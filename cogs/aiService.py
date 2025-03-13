@@ -1,3 +1,4 @@
+from datetime import time
 import logging
 
 from discord import ApplicationContext
@@ -17,8 +18,22 @@ class AIService(commands.Cog):
     def __init__(self, bot: discord.Bot, logger: logging.Logger) -> None:
         self.logger = logger
         self.bot = bot
-
         self.ai = ai.AIUtils()
+
+        self.reset_ai_usage.start()
+
+    @tasks.loop(time=time(hour=21, minute=18, tzinfo=Constants.SYSTIMEZONE))
+    async def reset_ai_usage(self):
+        """
+        Reset the usage of the AI service for all users.
+        """
+        users = await User.all()
+
+        for user in users:
+            await user.fetch_related("ai_metadata")
+            await user.ai_metadata.reset_usage()
+
+        self.logger.info("Reset AI usage for all users")
 
     @commands.slash_command(
         name="translate",
