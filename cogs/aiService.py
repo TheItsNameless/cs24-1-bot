@@ -22,7 +22,7 @@ class AIService(commands.Cog):
 
         self.reset_ai_usage.start()
 
-    @tasks.loop(time=time(hour=21, minute=18, tzinfo=Constants.SYSTIMEZONE))
+    @tasks.loop(time=time(hour=0, minute=5, tzinfo=Constants.SYSTIMEZONE))
     async def reset_ai_usage(self):
         """
         Reset the usage of the AI service for all users.
