@@ -21,7 +21,11 @@ def get_extensions() -> typing.List[str]:  # type: ignore
         yield file.as_posix()[:-3].replace("/", ".")  # type: ignore
 
 
-def load_extensions(bot: commands.Bot, logger: logging.Logger, extensions: typing.List[str]):
+def load_extensions(
+    bot: commands.Bot,
+    logger: logging.Logger,
+    extensions: typing.List[str]
+):
     for ext_file in extensions:
         try:
             bot.load_extension(ext_file)
