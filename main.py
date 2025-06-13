@@ -56,7 +56,8 @@ def setup_discord_logger():
         mode='w'
     )
     handler.setFormatter(
-        logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s')
+        logging.
+        Formatter('[%(levelname)s] (%(name)s) %(asctime)s : %(message)s')
     )
     logger.addHandler(handler)
 
@@ -70,13 +71,15 @@ def setup_bot_logger():
         mode='w'
     )
     handler.setFormatter(
-        logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s')
+        logging.
+        Formatter('[%(levelname)s] (%(name)s) %(asctime)s : %(message)s')
     )
     logger.addHandler(handler)
 
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(
-        logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s')
+        logging.
+        Formatter('[%(levelname)s] (%(name)s) %(asctime)s : %(message)s')
     )
     logger.addHandler(console_handler)
 
